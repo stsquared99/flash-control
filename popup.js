@@ -11,19 +11,24 @@ function getCurrentSite(callback) {
 
     console.assert(typeof url == 'string', 'tab.url should be a string');
 
-    var site = url.replace(/([^\/])\/[^\/].*/, "$1")
+    var site = url.replace(/([^\/])\/[^\/].*/, '$1')
 
     callback(site);
   });
 }
 
 function renderStatus(site) {
-  // document.getElementById('status').removeAttribute("checked");
-  document.getElementById('status').setAttribute("checked", true);
+  // document.getElementById('status').removeAttribute('checked');
+  document.getElementById('status').setAttribute('checked', true);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('status').addEventListener('click', function() {
+    console.log(chrome.contentSettings);
+  });
+
   getCurrentSite(function(site) {
     renderStatus(site);
   });
 });
+
