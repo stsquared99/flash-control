@@ -17,18 +17,55 @@ function getCurrentSite(callback) {
   });
 }
 
-function renderStatus(site) {
-  // document.getElementById('status').removeAttribute('checked');
-  document.getElementById('status').setAttribute('checked', true);
+function renderStatus() {
+  getCurrentSite(function(site) {
+    chrome.contentSettings.plugins.get({
+      'primaryUrl': site + '/*',
+    },
+    function(details) {
+      console.log(details);
+      if (details.setting === 'allow') {
+        document.getElementById('status').setAttribute('checked', true);
+
+        return;
+      }
+
+      document.getElementById('status').removeAttribute('checked');
+    });
+  });
+}
+
+function updateStatus(site) {
+  getCurrentSite(function(site) {
+    chrome.contentSettings.plugins.get({
+      'primaryUrl': site + '/*',
+    },
+    function(details) {
+      console.log(details);
+
+      var setting = 'allow';
+
+      if (details.setting === 'allow') {
+        setting = 'detect_important_content';
+      }
+
+      getCurrentSite(function(site) {
+        chrome.contentSettings.plugins.set({
+          'primaryPattern': site + '/*',
+          'setting': setting,
+        }, function() {
+          renderStatus();
+        });
+      });
+    });
+  });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('status').addEventListener('click', function() {
-    console.log(chrome.contentSettings);
+    updateStatus();
   });
 
-  getCurrentSite(function(site) {
-    renderStatus(site);
-  });
+  renderStatus();
 });
 
